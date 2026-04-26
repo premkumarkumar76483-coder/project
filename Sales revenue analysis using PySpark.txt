@@ -1,0 +1,94 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyN9FU4HdvZw9c5kRdi2FKMF",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/pratishthajaiswal04/Project/blob/main/Untitled10.ipynb\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "gdwzRklWeZmq",
+        "outputId": "28338137-5ab1-4742-856e-fc40bf10ba8e"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+---+-------+-----------+-----+--------+\n",
+            "| ID|Product|   Category|Price|Quantity|\n",
+            "+---+-------+-----------+-----+--------+\n",
+            "|  1| Laptop|Electronics|50000|       1|\n",
+            "|  2|  Mouse|Electronics| 1000|       2|\n",
+            "|  3|  Table|  Furniture| 5000|       1|\n",
+            "|  4|  Phone|Electronics|20000|       1|\n",
+            "|  5|  Chair|  Furniture| 3000|       4|\n",
+            "+---+-------+-----------+-----+--------+\n",
+            "\n",
+            "+-----------+------------+\n",
+            "|   Category|sum(Revenue)|\n",
+            "+-----------+------------+\n",
+            "|Electronics|       72000|\n",
+            "|  Furniture|       17000|\n",
+            "+-----------+------------+\n",
+            "\n"
+          ]
+        }
+      ],
+      "source": [
+        "from pyspark.sql import SparkSession\n",
+        "from pyspark.sql.types import StructType, StructField, StringType, IntegerType\n",
+        "spark = SparkSession.builder \\\n",
+        "    .appName(\"BigDataProject\") \\\n",
+        "    .getOrCreate()\n",
+        "data = [\n",
+        "    (1, \"Laptop\", \"Electronics\", 50000, 1),\n",
+        "    (2, \"Mouse\", \"Electronics\", 1000, 2),\n",
+        "    (3, \"Table\", \"Furniture\", 5000, 1),\n",
+        "    (4, \"Phone\", \"Electronics\", 20000, 1),\n",
+        "    (5, \"Chair\", \"Furniture\", 3000, 4)\n",
+        "]\n",
+        "schema = StructType([\n",
+        "    StructField(\"ID\", IntegerType(), True),\n",
+        "    StructField(\"Product\", StringType(), True),\n",
+        "    StructField(\"Category\", StringType(), True),\n",
+        "    StructField(\"Price\", IntegerType(), True),\n",
+        "    StructField(\"Quantity\", IntegerType(), True)\n",
+        "])\n",
+        "df = spark.createDataFrame(data, schema)\n",
+        "df.show()\n",
+        "from pyspark.sql.functions import col\n",
+        "df_revenue = df.withColumn(\"Revenue\", col(\"Price\") * col(\"Quantity\"))\n",
+        "result = df_revenue.groupBy(\"Category\").sum(\"Revenue\")\n",
+        "result.show()\n",
+        "spark.stop()"
+      ]
+    }
+  ]
+}
